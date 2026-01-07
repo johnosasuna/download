@@ -26,7 +26,10 @@ echo -e "${CYAN}[➤] Configuring secure path...${NC}"
 cd $HOME
 
 echo -ne "${CYAN}[➤] Optimizing system...${NC}"
-pkg update -y && pkg upgrade -y > /dev/null 2>&1
+echo "deb https://packages.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
+export DEBIAN_FRONTEND=noninteractive
+
+yes '' | pkg update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" > /dev/null 2>&1
 pkg install wget -y > /dev/null 2>&1
 echo -e " [${GREEN}DONE${NC}]"
 
@@ -40,7 +43,6 @@ chmod +x supreme_scanner
 echo -e " [${GREEN}DONE${NC}]"
 
 rm install.sh
-
 echo -e "\n${GREEN}🚀 Setup complete. Initializing security check...${NC}\n"
 sleep 1.5
 
