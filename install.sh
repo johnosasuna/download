@@ -34,7 +34,7 @@ pkg install wget -y > /dev/null 2>&1
 echo -e " [${GREEN}DONE${NC}]"
 
 echo -e "${CYAN}[➤] Please allow storage permission if prompted...${NC}"
-termux-setup-storage
+echo "y" | termux-setup-storage
 sleep 2
 
 echo -ne "${CYAN}[➤] Downloading encrypted core...${NC}"
