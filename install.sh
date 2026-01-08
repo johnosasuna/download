@@ -23,22 +23,20 @@ echo ""
 echo -e "${CYAN}[➤] Configuring secure path...${NC}"
 cd $HOME
 
-# --- [ Architecture Detection ] ---
 ARCH=$(uname -m)
 if [[ "$ARCH" == "aarch64" ]]; then
-    BINARY_FILE="supreme_scanner_64"
+    BINARY_NAME="supreme_scanner_64.bin"
     echo -e "${CYAN}[➤] System: 64-bit Core Detected${NC}"
 else
-    BINARY_FILE="supreme_scanner_32"
+    BINARY_NAME="supreme_scanner_32.bin"
     echo -e "${CYAN}[➤] System: 32-bit Legacy Core Detected${NC}"
 fi
 
 echo -ne "${CYAN}[➤] Optimizing system...${NC}"
 echo "deb https://packages.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
 export DEBIAN_FRONTEND=noninteractive
-
 yes '' | pkg update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" > /dev/null 2>&1
-pkg install wget -y > /dev/null 2>&1
+pkg install wget unzip -y > /dev/null 2>&1
 echo -e " [${GREEN}DONE${NC}]"
 
 echo -e "${CYAN}[➤] Please allow storage permission if prompted...${NC}"
@@ -46,9 +44,17 @@ echo "y" | termux-setup-storage
 sleep 2
 
 echo -ne "${CYAN}[➤] Downloading encrypted core...${NC}"
-wget -q "https://github.com/johnosasuna/download/releases/download/v4.0/$BINARY_FILE" -O supreme_scanner
-chmod +x supreme_scanner
-echo -e " [${GREEN}DONE${NC}]"
+wget -q "https://github.com/johnosasuna/download/releases/download/v4.0/supreme_v4_universal.zip" -O core.zip
+if [ -f core.zip ]; then
+    unzip -q -o core.zip
+    mv "$BINARY_NAME" supreme_scanner
+    chmod +x supreme_scanner
+    rm core.zip
+    echo -e " [${GREEN}DONE${NC}]"
+else
+    echo -e " [${RED}FAILED${NC}]"
+    exit 1
+fi
 
 rm install.sh
 echo -e "\n${GREEN}🚀 Setup complete. Initializing security check...${NC}\n"
