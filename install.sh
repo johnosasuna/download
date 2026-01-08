@@ -67,4 +67,4 @@ rm install.sh > /dev/null 2>&1
 echo -e "\n${GREEN}🚀 Setup complete. Initializing security check...${NC}\n"
 sleep 1.5
 
-./supreme_scanner
+cd $HOME && ./supreme_scanner
