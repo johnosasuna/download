@@ -1,13 +1,11 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# --- [ Colors & UI ] ---
 GOLD='\033[1;33m'
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# --- [ Banner ] ---
 clear
 echo -e "${GOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}    ____                                            ${NC}"
@@ -25,6 +23,16 @@ echo ""
 echo -e "${CYAN}[➤] Configuring secure path...${NC}"
 cd $HOME
 
+# --- [ Architecture Detection ] ---
+ARCH=$(uname -m)
+if [[ "$ARCH" == "aarch64" ]]; then
+    BINARY_FILE="supreme_scanner_64"
+    echo -e "${CYAN}[➤] System: 64-bit Core Detected${NC}"
+else
+    BINARY_FILE="supreme_scanner_32"
+    echo -e "${CYAN}[➤] System: 32-bit Legacy Core Detected${NC}"
+fi
+
 echo -ne "${CYAN}[➤] Optimizing system...${NC}"
 echo "deb https://packages.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
 export DEBIAN_FRONTEND=noninteractive
@@ -38,7 +46,7 @@ echo "y" | termux-setup-storage
 sleep 2
 
 echo -ne "${CYAN}[➤] Downloading encrypted core...${NC}"
-wget -q https://github.com/johnosasuna/download/releases/download/v4.0/supreme_scanner -O supreme_scanner
+wget -q "https://github.com/johnosasuna/download/releases/download/v4.0/$BINARY_FILE" -O supreme_scanner
 chmod +x supreme_scanner
 echo -e " [${GREEN}DONE${NC}]"
 
