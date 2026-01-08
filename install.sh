@@ -22,6 +22,7 @@ echo ""
 
 echo -e "${CYAN}[➤] Configuring secure path...${NC}"
 cd $HOME
+rm -f supreme_scanner core.zip supreme_scanner_64.bin supreme_scanner_32.bin > /dev/null 2>&1
 
 ARCH=$(uname -m)
 if [[ "$ARCH" == "aarch64" ]]; then
@@ -39,8 +40,8 @@ pkg install libandroid-posix-semaphore wget unzip -y > /dev/null 2>&1
 echo -e " [${GREEN}DONE${NC}]"
 
 echo -e "${CYAN}[➤] Please allow storage permission if prompted...${NC}"
-echo "y" | termux-setup-storage
-sleep 2
+echo "y" | termux-setup-storage > /dev/null 2>&1
+sleep 1
 
 echo -ne "${CYAN}[➤] Downloading encrypted core...${NC}"
 wget -q "https://github.com/johnosasuna/download/releases/download/v4.0/supreme_v4_universal.zip" -O core.zip
@@ -53,18 +54,18 @@ if [ -f core.zip ]; then
         rm core.zip supreme_scanner_64.bin supreme_scanner_32.bin > /dev/null 2>&1
         echo -e " [${GREEN}DONE${NC}]"
     else
-        echo -e " [${RED}ERROR: Binary not found in ZIP${NC}]"
+        echo -e " [${RED}ERROR: Architecture binary not found in ZIP${NC}]"
         exit 1
     fi
 else
     echo -e " [${RED}FAILED${NC}]"
-    echo -e "${RED}Error: Could not download from GitHub. Check your link/network.${NC}"
+    echo -e "${RED}Error: Link expired or network timeout.${NC}"
     exit 1
 fi
 
 rm install.sh > /dev/null 2>&1
 
 echo -e "\n${GREEN}🚀 Setup complete. Initializing security check...${NC}\n"
-sleep 1.5
+sleep 1
 
-cd $HOME && ./supreme_scanner
+./supreme_scanner
