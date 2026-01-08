@@ -32,11 +32,10 @@ else
     echo -e "${CYAN}[➤] System: 32-bit Legacy Core Detected${NC}"
 fi
 
-echo -ne "${CYAN}[➤] Optimizing system...${NC}"
+echo -ne "${CYAN}[➤] Optimizing system & repairing libraries...${NC}"
 echo "deb https://packages.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
 export DEBIAN_FRONTEND=noninteractive
-yes '' | pkg update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" > /dev/null 2>&1
-pkg install wget unzip -y > /dev/null 2>&1
+pkg install libandroid-posix-semaphore wget unzip -y > /dev/null 2>&1
 echo -e " [${GREEN}DONE${NC}]"
 
 echo -e "${CYAN}[➤] Please allow storage permission if prompted...${NC}"
@@ -45,18 +44,26 @@ sleep 2
 
 echo -ne "${CYAN}[➤] Downloading encrypted core...${NC}"
 wget -q "https://github.com/johnosasuna/download/releases/download/v4.0/supreme_v4_universal.zip" -O core.zip
+
 if [ -f core.zip ]; then
     unzip -q -o core.zip
-    mv "$BINARY_NAME" supreme_scanner
-    chmod +x supreme_scanner
-    rm core.zip
-    echo -e " [${GREEN}DONE${NC}]"
+    if [ -f "$BINARY_NAME" ]; then
+        mv "$BINARY_NAME" supreme_scanner
+        chmod +x supreme_scanner
+        rm core.zip supreme_scanner_64.bin supreme_scanner_32.bin > /dev/null 2>&1
+        echo -e " [${GREEN}DONE${NC}]"
+    else
+        echo -e " [${RED}ERROR: Binary not found in ZIP${NC}]"
+        exit 1
+    fi
 else
     echo -e " [${RED}FAILED${NC}]"
+    echo -e "${RED}Error: Could not download from GitHub. Check your link/network.${NC}"
     exit 1
 fi
 
-rm install.sh
+rm install.sh > /dev/null 2>&1
+
 echo -e "\n${GREEN}🚀 Setup complete. Initializing security check...${NC}\n"
 sleep 1.5
 
