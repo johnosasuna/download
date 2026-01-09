@@ -14,9 +14,11 @@ NC='\033[0m'
 
 clear
 
-echo -e "${CYAN}[➤] Initializing environment...${NC}"
-echo "" | termux-setup-storage
-sleep 1
+if [ ! -d "$HOME/storage" ]; then
+    echo -e "${CYAN}[➤] Configuring storage...${NC}"
+    echo "" | termux-setup-storage > /dev/null 2>&1
+    sleep 1
+fi
 
 if ! command -v jq &> /dev/null; then
     pkg install jq -y > /dev/null 2>&1
@@ -24,7 +26,7 @@ fi
 
 RELEASE_INFO=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest")
 LATEST_TAG=$(echo "$RELEASE_INFO" | jq -r '.tag_name // "v1.0"')
-DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | test("universal.zip")) | .browser_download_url' 2>/dev/null)
+DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | test("universal.zip")) | .browser_download_url' | head -n 1)
 
 if [[ -z "$DOWNLOAD_URL" || "$DOWNLOAD_URL" == "null" ]]; then
     DOWNLOAD_URL="$FALLBACK_URL"
@@ -54,9 +56,11 @@ fi
 cd $HOME || exit 1
 echo -e "${CYAN}[➤] Downloading latest components...${NC}"
 
+rm -f core.zip supreme_scanner
+
 wget -L --show-progress "$DOWNLOAD_URL" -O core.zip
 
-if [[ -f core.zip ]]; then
+if [[ -f core.zip && -s core.zip ]]; then
     echo -ne "${CYAN}[➤] Installing...${NC}"
     unzip -q -o core.zip
     
@@ -67,10 +71,12 @@ if [[ -f core.zip ]]; then
         echo -e " [${GREEN}DONE${NC}]"
     else
         echo -e "\n${RED}[!] Error: Binary $TARGET_BIN not found in ZIP.${NC}"
+        echo -e "${CYAN}Files found in ZIP:${NC}"
+        unzip -l core.zip
         exit 1
     fi
 else
-    echo -e "${RED}[!] Error: Download failed. Check internet connection.${NC}"
+    echo -e "${RED}[!] Error: Downloaded file is empty or missing.${NC}"
     exit 1
 fi
 
@@ -79,6 +85,4 @@ sleep 1
 
 if [[ -f "./supreme_scanner" ]]; then
     ./supreme_scanner
-else
-    echo -e "${RED}[!] Error: Executable not found.${NC}"
 fi
