@@ -14,7 +14,7 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# 1. SILENT STORAGE & JQ CHECK
+# Silent Init
 if [ ! -d "$HOME/storage" ]; then
     echo "" | termux-setup-storage > /dev/null 2>&1
 fi
@@ -23,7 +23,7 @@ if ! command -v jq &> /dev/null; then
     pkg install jq -y > /dev/null 2>&1
 fi
 
-# Fetch Version Info Silently
+# Fetch Version Info
 RELEASE_INFO=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest")
 LATEST_TAG=$(echo "$RELEASE_INFO" | jq -r '.tag_name // "v1.0"')
 DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url' | head -n 1)
@@ -31,7 +31,7 @@ DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | endswith
 [[ -z "$DOWNLOAD_URL" || "$DOWNLOAD_URL" == "null" ]] && DOWNLOAD_URL="$FALLBACK_URL"
 
 clear
-# 2. PREMIUM HEADER
+# --- HEADER ---
 echo -e "${GOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}    ____                                            ${NC}"
 echo -e "${CYAN}   / ___| _   _ _ __  _ __ ___ _ __ ___   ___      ${NC}"
@@ -44,14 +44,14 @@ echo -e "${RED}  👤 Developer : @RookieHax${NC}"
 echo -e "${RED}  📢 Telegram  : t.me/supremebughost${NC}"
 echo -e "${GOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-# 3. YOUR ORIGINAL SYSTEM REPAIR (RESTORED)
+# --- SYSTEM FIXES (KEEPING YOUR ORIGINAL LOGIC) ---
 echo -ne "${CYAN}[➤] Optimizing system & repairing libraries...${NC}"
 echo "deb https://packages.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
 export DEBIAN_FRONTEND=noninteractive
 pkg install libandroid-posix-semaphore wget unzip -y > /dev/null 2>&1
 echo -e " [${GREEN}DONE${NC}]"
 
-# 4. ARCHITECTURE DETECTION
+# --- ARCH DETECTION ---
 ARCH=$(uname -m)
 if [[ "$ARCH" == "aarch64" ]]; then
     TARGET_BIN="$BINARY_NAME_64"
@@ -61,14 +61,15 @@ else
     echo -e "${CYAN}[➤] System: 32-bit Legacy Core Detected${NC}"
 fi
 
-# 5. CLEAN DOWNLOAD & INSTALL
+# --- CLEAN DOWNLOAD ---
 cd $HOME || exit 1
 rm -f core.zip supreme_scanner
 
 echo -e "${CYAN}[➤] Downloading latest components...${NC}"
-# -q hides the junk, --show-progress keeps the status bar
+# -q removes the long URL and IP logs, --show-progress keeps the clean bar
 wget -q --show-progress -L "$DOWNLOAD_URL" -O core.zip
 
+# --- INSTALLATION ---
 if [[ -f core.zip && -s core.zip ]]; then
     echo -ne "${CYAN}[➤] Installing components...${NC}"
     unzip -q -o core.zip
@@ -79,7 +80,7 @@ if [[ -f core.zip && -s core.zip ]]; then
         rm -f core.zip "$BINARY_NAME_64" "$BINARY_NAME_32"
         echo -e " [${GREEN}DONE${NC}]"
     else
-        echo -e "\n${RED}[!] Error: Binary $TARGET_BIN not found in ZIP.${NC}"
+        echo -e "\n${RED}[!] Error: Binary $TARGET_BIN not found.${NC}"
         exit 1
     fi
 else
@@ -90,7 +91,7 @@ fi
 echo -e "\n${GREEN}🚀 Setup complete. Initializing scanner...${NC}\n"
 sleep 1
 
-# 6. EXECUTE
+# --- EXECUTE ---
 if [[ -f "./supreme_scanner" ]]; then
     ./supreme_scanner
 fi
